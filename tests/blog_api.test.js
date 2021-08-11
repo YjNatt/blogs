@@ -104,7 +104,7 @@ describe('adding blogs', () => {
 describe('deleting blog', () => {
   test('delete a single blog', async() => {
     let response = await api.get('/api/blogs')
-    let blog = response.body[0];
+    const blog = response.body[0];
 
     await api.delete(`/api/blogs/${blog.id}`)
              .expect(204)
@@ -114,3 +114,18 @@ describe('deleting blog', () => {
     expect(blogIds).not.toContain(blog.id)
   });
 })
+
+describe('updateing blog', () => {
+  test('update likes on blog', async() => {
+    let response = await api.get('/api/blogs')
+    const blog = response.body[0];
+    blog.likes = 123;
+
+    response = await api.put(`/api/blogs/${blog.id}`)
+                        .send(blog);
+
+    const updatedBlog = response.body;
+    expect(updatedBlog.id).toBe(blog.id);
+    expect(updatedBlog.likes).toBe(123);
+  });
+});
