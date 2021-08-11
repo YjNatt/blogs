@@ -32,7 +32,7 @@ test('blog identifier attribute is id', async() => {
 
 test('valid blog is added', async() => {
   const newBlog = {
-    title: "Blog",
+    title: "New blog",
     author: "author",
     url: "url",
     likes: 23
@@ -50,3 +50,19 @@ test('valid blog is added', async() => {
   const likes = blogs.map(({likes}) => likes)
   expect(likes).toContain(23);
 });
+
+test('blog likes property is missing', async () => {
+  const newBlog = {
+    title: "New blog",
+    author: "author",
+    url: "url",
+  }
+
+  await api.post('/api/blogs')
+           .send(newBlog)
+           .expect(201)
+           .expect('Content-Type', /application\/json/);
+  const response = await api.get('/api/blogs');
+  const blog = response.body.find(blog => blog.title === "New blog");
+  expect(blog.likes).toBe(0);
+})
