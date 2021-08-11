@@ -86,3 +86,38 @@ describe('total likes', () => {
     expect(result).toBe(0);
   })
 });
+
+describe('favorite blog', () => {
+  test('When list has 1 blog', () => {
+    const blog = blogs[0]
+    const result = listHelper.favoriteBlog([blog]);
+    const expected = {
+      title: blog.title,
+      author: blog.author,
+      likes: blog.likes,
+    };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('When list has multiple blogs', () => {
+    const result = listHelper.favoriteBlog(blogs);
+    const expected = {
+      title: "Canonical string reduction",
+      author: "Edsger W. Dijkstra",
+      likes: 12,
+    };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('When list is empty', () => {
+    const expected = {
+      title: "",
+      author: "",
+      likes: 0,
+    };
+
+    expect(listHelper.favoriteBlog([])).toEqual(expected);
+  })
+});
