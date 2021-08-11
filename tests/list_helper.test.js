@@ -119,5 +119,70 @@ describe('favorite blog', () => {
     };
 
     expect(listHelper.favoriteBlog([])).toEqual(expected);
+  });
+});
+
+describe('most blogs', () => {
+  test('When list has 1 blog', () => {
+    const blog = blogs[1];
+    const result = listHelper.mostBlogs([blog]);
+    const expected = { author: blog.author, blogs: 1};
+
+    expect(result).toEqual(expected);
+  });
+
+  test('When list has multiple of same blogs', () => {
+    const blog = blogs[1]
+    const result = listHelper.mostBlogs([blog, blog, blog]);
+    const expected = { author: blog.author, blogs: 3};
+
+    expect(result).toEqual(expected);
+  });
+
+  test('When List has multiple of different blogs', () => {
+    const result = listHelper.mostBlogs(blogs);
+    const expected = { author: 'Robert C. Martin', blogs: 3 };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('When list is empty', () => {
+    const result = listHelper.mostBlogs([]);
+    const expected = { author: '', blogs: 0 };
+
+    expect(result).toEqual(expected);
   })
+});
+
+describe('Most likes', () => {
+  test('When list is empty', () => {
+    const result = listHelper.mostLikes([]);
+    const expected = { author: '', likes: 0 };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('When list has 1 blog', () => {
+    const blog = blogs[0]
+    const result = listHelper.mostLikes([blog]);
+    const expected = { author: blog.author, likes: blog.likes };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('When list has multiple from same author blog', () => {
+    const blog = blogs[0]
+    const likes = [blog, blog, blog].reduce((total, blog) => total + blog.likes, 0);
+    const result = listHelper.mostLikes([blog, blog, blog]);
+    const expected = { author: blog.author, likes };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('When list has multiple different blogs', () => {
+    const result = listHelper.mostLikes(blogs);
+    const expected = { author: 'Edsger W. Dijkstra', likes: 17 };
+
+    expect(result).toEqual(expected);
+  });
 });
