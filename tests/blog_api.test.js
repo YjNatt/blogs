@@ -51,7 +51,7 @@ test('valid blog is added', async() => {
   expect(likes).toContain(23);
 });
 
-test('blog likes property is missing', async () => {
+test('add blog missing likes property', async () => {
   const newBlog = {
     title: "New blog",
     author: "author",
@@ -65,4 +65,34 @@ test('blog likes property is missing', async () => {
   const response = await api.get('/api/blogs');
   const blog = response.body.find(blog => blog.title === "New blog");
   expect(blog.likes).toBe(0);
-})
+});
+
+test('add blog missing author property', async() => {
+  const newBlog = {
+    title: "New blog",
+    url: "url",
+    likes: 23
+  }
+
+  await api.post('/api/blogs')
+           .send(newBlog)
+           .expect(400);
+
+  const response = await api.get('/api/blogs')
+  expect(response.body).toHaveLength(helper.initialBlogs.length)
+});
+
+test('add blog missing title property', async() => {
+  const newBlog = {
+    author: "author",
+    url: "url",
+    likes: 23
+  }
+
+  await api.post('/api/blogs')
+           .send(newBlog)
+           .expect(400);
+
+  const response = await api.get('/api/blogs')
+  expect(response.body).toHaveLength(helper.initialBlogs.length)
+});
