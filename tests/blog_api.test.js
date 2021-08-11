@@ -14,13 +14,18 @@ beforeEach(async () => {
 });
 
 test('blogs returned as json', async () => {
-  const request =  await api.get('/api/blogs')
+  const request = await api.get('/api/blogs')
                             .expect(200)
                             .expect('Content-Type', /application\/json/);
 })
 
 test('blogs returned the corrent number of blog posts', async () => {
-  const request =  await api.get('/api/blogs')
+  const request = await api.get('/api/blogs')
   const blogs = request.body;
   expect(blogs).toHaveLength(helper.initialBlogs.length)
+});
+
+test('blog identifier attribute is id', async () => {
+  const request = await api.get('/api/blogs')
+  expect(request.body[0]).toBeDefined();
 });
