@@ -7,6 +7,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const blogRouter = require('./controllers/blogs');
 const userRouter = require('./controllers/users');
+const middleware = require('./utils/middleware');
 
 const mongoURL = config.MONGODB_URI
 mongoose.connect(mongoURL, {
@@ -16,11 +17,15 @@ mongoose.connect(mongoURL, {
   useCreateIndex: true
 });
 
+app.use(middleware.requestLogger);
+
 app.use(cors());
 app.use(express.json());
 app.use('/api/blogs', blogRouter);
 app.use('/api/users', userRouter);
 
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 app.listen(config.PORT, () => {
   console.log(`Server running on port ${config.PORT}`);
 });
