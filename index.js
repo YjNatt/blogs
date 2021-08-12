@@ -19,6 +19,7 @@ mongoose.connect(mongoURL, {
 });
 
 app.use(middleware.requestLogger);
+app.use(middleware.tokenExtractor)
 
 app.use(cors());
 app.use(express.json());
