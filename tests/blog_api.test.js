@@ -1,16 +1,23 @@
 const helper = require('./test_helper');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 const supertest = require('supertest');
 const app = require('../index');
 const api = supertest(app);
 
-
 beforeEach(async() => {
+  await User.deleteMany({});
+  const response = await api.post('/api/users')
+                   .send(helper.testUserDetails);
+
+  const userId = response.body.id
+
   await Blog.deleteMany({});
   for (index = 0; index < helper.initialBlogs.length; index += 1) {
-    const blog = new Blog(helper.initialBlogs[index]);
+    const blog = new Blog({ user: userId, ...helper.initialBlogs[index]});
     await blog.save();
   }
+
 });
 
 describe('fetching blogs', () => {
@@ -41,8 +48,16 @@ describe('adding blogs', () => {
       likes: 23
     }
 
+    const users = await helper.usersInDb();
+    const user = users[0]
+    const credentials = await api.post('/api/login')
+                                 .send({ username: user.username, password: 'test' })
+                                 .expect(200);
+    const token = credentials.body.token;
+
     await api.post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `bearer ${token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/);
 
@@ -61,8 +76,16 @@ describe('adding blogs', () => {
       url: "url",
     }
 
+    const users = await helper.usersInDb();
+    const user = users[0]
+    const credentials = await api.post('/api/login')
+                                 .send({ username: user.username, password: 'test' })
+                                 .expect(200);
+    const token = credentials.body.token;
+
     await api.post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `bearer ${token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/);
     const response = await api.get('/api/blogs');
@@ -77,9 +100,17 @@ describe('adding blogs', () => {
       likes: 23
     }
 
+    const users = await helper.usersInDb();
+    const user = users[0]
+    const credentials = await api.post('/api/login')
+                                 .send({ username: user.username, password: 'test' })
+                                 .expect(200);
+    const token = credentials.body.token;
+
     await api.post('/api/blogs')
-            .send(newBlog)
-            .expect(400);
+             .send(newBlog)
+             .set('Authorization', `bearer ${token}`)
+             .expect(400);
 
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.initialBlogs.length)
@@ -92,8 +123,17 @@ describe('adding blogs', () => {
       likes: 23
     }
 
+    const users = await helper.usersInDb();
+    const user = users[0]
+    const credentials = await api.post('/api/login')
+                                 .send({ username: user.username, password: 'test' })
+                                 .expect(200);
+
+    const token = credentials.body.token;
+
     await api.post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `bearer ${token}`)
             .expect(400);
 
     const response = await api.get('/api/blogs')
@@ -106,7 +146,16 @@ describe('deleting blog', () => {
     let response = await api.get('/api/blogs')
     const blog = response.body[0];
 
+    const users = await helper.usersInDb();
+    const user = users[0]
+    const credentials = await api.post('/api/login')
+                                 .send({ username: user.username, password: 'test' })
+                                 .expect(200);
+
+    const token = credentials.body.token;
+
     await api.delete(`/api/blogs/${blog.id}`)
+             .set('Authorization', `bearer ${token}`)
              .expect(204)
 
     response = await api.get('/api/blogs')
@@ -121,8 +170,17 @@ describe('updateing blog', () => {
     const blog = response.body[0];
     blog.likes = 123;
 
+    const users = await helper.usersInDb();
+    const user = users[0]
+    const credentials = await api.post('/api/login')
+                                 .send({ username: user.username, password: 'test' })
+                                 .expect(200);
+
+    const token = credentials.body.token;
+
     response = await api.put(`/api/blogs/${blog.id}`)
-                        .send(blog);
+                        .send(blog)
+                        .set('Authorization', `bearer ${token}`);
 
     const updatedBlog = response.body;
     expect(updatedBlog.id).toBe(blog.id);
